@@ -10,9 +10,20 @@ workflow {
 	
 	
 	// input channels
-	
+	ch_snp_tables = Channel
+		.fromPath( "${params.input_dir}/*.xlsx" )
+		.collect()
+
 	
 	// Workflow steps 
+	SELECT_CYCLES (
+		ch_snp_tables
+	)
+
+	COLLATE_RESULTS (
+		SELECT_CYCLES.out.cycles,
+		ch_snp_tables
+	)
 	
 	
 }
@@ -32,29 +43,36 @@ workflow {
 // PROCESS SPECIFICATION 
 // --------------------------------------------------------------- //
 
-process PROCESS_NAME {
+process SELECT_CYCLES {
 	
-	// This process does something described here
-	
-	tag "${tag}"
 	publishDir params.results, mode: 'copy'
 	
-	memory 1.GB
-	cpus 1
-	time '10minutes'
-	
 	input:
-	
+	path excel_files
 	
 	output:
-	
-	
-	when:
-	
+	path "*.csv", emit: cycles
 	
 	script:
 	"""
+	select-optimal-cycle.R
+	"""
+}
+
+process COLLATE_RESULTS {
 	
+	publishDir params.results, mode: 'copy'
+	
+	input:
+	path cycles
+	path excel_files
+	
+	output:
+	path "*.xlsx"
+	
+	script:
+	"""
+	create-concordance-pivot.R ${cycles}
 	"""
 }
 
