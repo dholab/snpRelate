@@ -1,5 +1,9 @@
 FROM ubuntu:20.04
 
+# Set environment variables
+ENV DEBIAN_FRONTEND noninteractive
+ENV TZ America/New_York
+
 # Install dependencies
 RUN apt-get update && \
     apt-get install -y --no-install-recommends \
@@ -46,10 +50,6 @@ RUN apt-get update && \
     procps \
     && apt-get clean \
     && rm -rf /var/lib/apt/lists/*
-
-# Set environment variables
-ENV DEBIAN_FRONTEND noninteractive
-ENV TZ America/New_York
 
 # Install nextflow
 RUN wget -qO- https://get.nextflow.io | bash && \
