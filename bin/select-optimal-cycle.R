@@ -13,10 +13,6 @@ library(writexl)
 # create a vector of detailed report files
 results_files <- list.files(path = ".", pattern = "_Detailed_Results")
 
-# create a data frame of optimal cycles for all SNPs
-cycles <- data.frame("SNP" = sort(unique(data$SNP)),
-                     "cycle" = as.character(NA))
-
 # make a data frame that records best cycles for each assay
 best_cycles <- data.frame("SNP" = as.character(NA),
                           "distance" = as.numeric(0),
@@ -31,7 +27,7 @@ for (i in results_files){
   
   # define cycle based on file name
   cycle <- 7
-  centroid_distances[index, "cycle"] <- cycle
+  # best_cycles[index, "cycle"] <- cycle
   
   # Read in the data
   data <- read_excel(i, sheet = 1, skip = 15)
