@@ -26,8 +26,9 @@ for (i in results_files){
   index <- which(results_files==i)
   
   # define cycle based on file name
-  cycle <- 7
-  # best_cycles[index, "cycle"] <- cycle
+  cycle <- unlist(strsplit(i, split = "\\."))[1] %>%
+    str_sub(-1,-1) %>%
+    as.integer()
   
   # Read in the data
   data <- read_excel(i, sheet = 1, skip = 15)
