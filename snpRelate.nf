@@ -8,22 +8,44 @@ nextflow.enable.dsl = 2
 // --------------------------------------------------------------- //
 workflow {
 	
-	
-	// input channels
-	ch_snp_tables = Channel
-		.fromPath( "${params.input_dir}/*.xlsx" )
-		.collect()
+	if ( params.cycles == "" ){
+
+		// input channels
+		ch_snp_tables = Channel
+			.fromPath( "${params.input_dir}/*.xlsx" )
+			.collect()
+
+		
+		// Workflow steps 
+		SELECT_CYCLES (
+			ch_snp_tables
+		)
+
+		COLLATE_RESULTS (
+			SELECT_CYCLES.out.cycles,
+			ch_snp_tables
+		)
+
+	} else {
+
+		// input channels
+		ch_snp_tables = Channel
+			.fromPath( "${params.input_dir}/*.xlsx" )
+			.collect()
+		
+		ch_cycles = Channel
+			.fromPath( params.cycles )
+
+		
+		// Workflow steps 
+		COLLATE_RESULTS (
+			ch_cycles,
+			ch_snp_tables
+		)
+
+	}
 
 	
-	// Workflow steps 
-	SELECT_CYCLES (
-		ch_snp_tables
-	)
-
-	COLLATE_RESULTS (
-		SELECT_CYCLES.out.cycles,
-		ch_snp_tables
-	)
 	
 	
 }
