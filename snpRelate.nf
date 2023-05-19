@@ -26,6 +26,10 @@ workflow {
 			ch_snp_tables
 		)
 
+		PREDICT_RELATEDNESS (
+			COLLATE_RESULTS.out
+		)
+
 	} else {
 
 		// input channels
@@ -43,10 +47,11 @@ workflow {
 			ch_snp_tables
 		)
 
-	}
+		PREDICT_RELATEDNESS (
+			COLLATE_RESULTS.out
+		)
 
-	
-	
+	}
 	
 }
 // --------------------------------------------------------------- //
@@ -95,6 +100,23 @@ process COLLATE_RESULTS {
 	script:
 	"""
 	create-concordance-pivot.R ${cycles}
+	"""
+}
+
+process PREDICT_RELATEDNESS {
+
+	input:
+	path concordance_table
+
+	output:
+	path "*.xlsx"
+
+	when:
+	params.in_dev == false
+
+	script:
+	"""
+	echo "in development"
 	"""
 }
 
