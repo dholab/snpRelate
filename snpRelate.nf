@@ -21,6 +21,11 @@ workflow {
 			ch_snp_tables
 		)
 
+		PLOT_BEST_CYCLES (
+			SELECT_CYCLES.out.cycles,
+			ch_snp_tables
+		)
+
 		COLLATE_RESULTS (
 			SELECT_CYCLES.out.cycles,
 			ch_snp_tables
@@ -41,7 +46,12 @@ workflow {
 			.fromPath( params.cycles )
 
 		
-		// Workflow steps 
+		// Workflow steps
+		PLOT_BEST_CYCLES (
+			ch_cycles,
+			ch_snp_tables
+		)
+
 		COLLATE_RESULTS (
 			ch_cycles,
 			ch_snp_tables
@@ -86,6 +96,27 @@ process SELECT_CYCLES {
 	"""
 }
 
+process PLOT_BEST_CYCLES {
+
+	publishDir params.results, mode: 'copy'
+	
+	input:
+	path cycles
+	path excel_files
+
+	output:
+	path "*.pdf"
+
+	when:
+	params.in_dev == false
+
+	script:
+	"""
+	echo "in development"
+	"""
+
+}
+
 process COLLATE_RESULTS {
 	
 	publishDir params.results, mode: 'copy'
@@ -101,6 +132,7 @@ process COLLATE_RESULTS {
 	"""
 	create-concordance-pivot.R ${cycles}
 	"""
+
 }
 
 process PREDICT_RELATEDNESS {
@@ -118,6 +150,7 @@ process PREDICT_RELATEDNESS {
 	"""
 	echo "in development"
 	"""
+
 }
 
 // --------------------------------------------------------------- //
