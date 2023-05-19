@@ -15,7 +15,7 @@ results_files <- list.files(path = ".", pattern = "_Detailed_Results")
 
 # make a data frame that records best cycles for each assay
 best_cycles <- data.frame("SNP" = as.character(NA),
-                          "distance" = as.numeric(0),
+                          "mean_distance" = as.numeric(0),
                           "cycle" = as.numeric(0))
 best_cycles <- best_cycles[NULL,]
 
@@ -53,7 +53,7 @@ for (i in results_files){
     # add new row to best_cycles data frame
     if (!(snp %in% best_cycles$SNP)){
       best_cycles <- rbind(best_cycles, c(snp, 0, 0))
-      colnames(best_cycles) <- c("SNP","distance","cycle")
+      colnames(best_cycles) <- c("SNP","mean_distance","cycle")
     }
     
     snp_table <- data[data$SNP==snp,]
@@ -75,6 +75,8 @@ for (i in results_files){
         if (nrow(centroids)>1){
           # Calculate pairwise distances
           distances <- dist(centroids[, c("X", "Y")])
+        } else {
+          distances <- c(0,0)
         }
         
       } else if (nrow(subset_data) == 0){
@@ -92,14 +94,14 @@ for (i in results_files){
         
       }
       
-      if (nrow(centroids)==0){
-        distances = c(0,0)
+      if (mean(centroids$X)==0){
+        distances <- c(0,0)
       }
       
       # determine if this is the best-yet cycle for this SNP
-      if (mean(distances) > best_cycles[best_cycles$SNP==snp, "distance"] 
-          | is.null(best_cycles[best_cycles$SNP==snp, "distance"])){
-        best_cycles[best_cycles$SNP==snp, "distance"] <- mean(distances)
+      if (mean(distances) > best_cycles[best_cycles$SNP==snp, "mean_distance"] 
+          | is.null(best_cycles[best_cycles$SNP==snp, "mean_distance"])){
+        best_cycles[best_cycles$SNP==snp, "mean_distance"] <- mean(distances)
         best_cycles[best_cycles$SNP==snp, "cycle"] <- cycle
       }
       

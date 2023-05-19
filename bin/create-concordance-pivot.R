@@ -12,6 +12,15 @@ cycle_table = args[1]
 # create a vector of detailed report files
 results_files <- list.files(path = ".", pattern = "_Detailed_Results")
 
+# find available cycles
+available_cycles <- c()
+for (i in results_files){
+  cycle <- unlist(strsplit(i, split = "\\."))[1] %>%
+    str_sub(-1,-1) %>%
+    as.integer()
+  available_cycles <- c(available_cycles, cycle)
+}
+
 # read in optimal cycle table
 cycle_table <- read.csv(cycle_table)
 
@@ -29,6 +38,10 @@ for (snp in concordance_table$SNP){
   
   # determine optimal cycle
   optimal_cycle <- as.integer(cycle_table[cycle_table$SNP==snp,"cycle"])
+  
+  if (!(optimal_cycle %in% available_cycles)){
+    optimal_cycle <- 7
+  }
   
   # read in the correct BioMark output file based on that cycle
   data <- read_excel(paste("28637_BMX003_Detailed_Results_cycle", optimal_cycle, ".xlsx", sep = ""), 
