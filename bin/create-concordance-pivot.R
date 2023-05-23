@@ -25,23 +25,34 @@ for (i in results_files){
 # read in optimal cycle table
 cycle_table <- read.csv(cycle_table)
 
+# remove unknown samples and correct column types
+# cycle_table <- cycle_table[cycle_table$cycle!="U" & cycle_table$cycle!="X" &
+#                              !is.na(cycle_table$cycle),]
+# cycle_table$cycle <- as.numeric(cycle_table$cycle)
+
 # Read in the list of SNPs
 SNPs <- read_excel(results_files[1], sheet = 1, skip = 15)[1] %>%
   separate(ID, into = c("sample", "SNP"), sep = "-") %>%
   subset(select = "SNP")
 
-# loop through each SNP to collate calls
+# make an empty data frame that will subsequently be filled for each SNP
 concordance_table <- data.frame("SNP" = sort(unique(SNPs$SNP)),	
                                 "Assay" = NA,
                                 "Cycle" = NA, 
                                 "Comments" = NA)
+# determine optimal cycles
+cycle_table <- cycle_table[order(cycle_table$SNP),]
+concordance_table$Cycle <- as.integer(cycle_table[cycle_table$SNP==concordance_table$SNP,"cycle"])
+concordance_table <- concordance_table[concordance_table$Cycle!=0,]
+
+# loop through each SNP to collate calls
 for (snp in concordance_table$SNP){
   
   # determine optimal cycle
   optimal_cycle <- as.integer(cycle_table[cycle_table$SNP==snp,"cycle"])
   
   if (!(optimal_cycle %in% available_cycles)){
-    optimal_cycle <- 7
+    break
   }
   
   # read in the correct BioMark output file based on that cycle
@@ -152,8 +163,6 @@ colnames(concordance_table) <- NULL
 concordance_table <- rbind(new_row1, new_row2, concordance_table)
 concordance_table <- cbind(concordance_table, new_cols)
 colnames(concordance_table) <- NULL
-
-
 
 # write output file for viewing in excel
 write_xlsx(concordance_table, "concordance-table.xlsx", col_names = F)
