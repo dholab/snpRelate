@@ -112,4 +112,4 @@ for (i in results_files){
 }
 
 # output file
-write.csv(best_cycles, file = "optimal-cycles.csv")
+write.csv(best_cycles, file = "optimal-cycles.csv", row.names = F, quote = F)

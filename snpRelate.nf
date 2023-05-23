@@ -89,6 +89,9 @@ process SELECT_CYCLES {
 	
 	output:
 	path "*.csv", emit: cycles
+
+	when:
+	params.cycles == ""
 	
 	script:
 	"""
@@ -130,7 +133,7 @@ process COLLATE_RESULTS {
 	
 	script:
 	"""
-	create-concordance-pivot.R ${cycles}
+	create-concordance-pivot.R ${cycles} ${params.manifest}
 	"""
 
 }
