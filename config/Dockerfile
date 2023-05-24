@@ -76,7 +76,10 @@ RUN wget https://julialang-s3.julialang.org/bin/linux/x64/1.9/julia-1.9.0-linux-
     rm julia-1.9.0-linux-x86_64.tar.gz
 
 # Install python packages
-RUN mamba install -y -c conda-forge polars pandas xlsxwriter
+RUN mamba install -y -c conda-forge polars pandas xlsxwriter pypy
+
+# pip based python installations
+RUN pip install xlsx2csv
 
 # Make sure nothing is amiss and that julia is still in the path
 ENV PATH=/usr/local/bin:$PATH
