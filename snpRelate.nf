@@ -133,7 +133,7 @@ process COLLATE_RESULTS {
 	
 	script:
 	"""
-	create-concordance-pivot.R ${cycles} ${params.manifest}
+	create-concordance-pivot.py ${cycles} ${params.manifest}
 	"""
 
 }

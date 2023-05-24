@@ -3,7 +3,6 @@
 import sys
 import os
 import polars as pl
-import xlsxwriter
 
 # Check if the input TSV file is a symlink, and if it is, follow the symlink
 cycle_table = os.path.realpath(sys.argv[1])
@@ -29,9 +28,7 @@ SNPs = SNPs.select(pl.col("ID").str.split(by="-")).with_columns(
                 for i in range(2)
             ]
         ).alias('id_struct')
-        )
-SNPs = SNPs.unnest('id_struct')
-SNPs = SNPs.drop('ID')
+        ).unnest('id_struct').drop('ID')
 
 # Create an empty data frame that will subsequently be filled for each SNP
 concordance_table = pl.DataFrame({
@@ -43,6 +40,14 @@ concordance_table = pl.DataFrame({
 
 # Filter out SNPs with not optimal cycle
 concordance_table = concordance_table.filter(pl.col('Cycle') != 0)
+
+# Create an empty dictionary to store the excel dataframes
+df_dict = {}
+
+# Read in the Excel files and store them in the dictionary
+for file in results_files:
+    i = int(file.split('.')[0].split('_cycle')[-1])
+    df_dict[i] = pl.read_excel(file, read_csv_options={"skip_rows": 15})
 
 # Loop through each SNP to collate calls
 for i in range(len(concordance_table)):
@@ -57,7 +62,7 @@ for i in range(len(concordance_table)):
         break
 
     # Read in the correct BioMark output file based on that cycle
-    data = pl.read_excel(f"28637_BMX003_Detailed_Results_cycle{optimal_cycle}.xlsx", read_csv_options={"skip_rows": 15})
+    data = df_dict[optimal_cycle]
     snp_sample = data.select(pl.col("ID").str.split(by="-")).with_columns(
         pl.struct(
             [
@@ -81,7 +86,7 @@ for i in range(len(concordance_table)):
 
     if snp == concordance_table['SNP'][0]:
         for animal in sorted(snp_table['Name'].unique()):
-            call = snp_table.filter(pl.col('Name') == animal)['Final'].unique()[0]
+            call = snp_table.filter(pl.col('Name') == animal)['Final'].unique()
             concordance_table = concordance_table.with_columns([
               pl.col('Assay').alias(animal)
             ])
@@ -90,7 +95,7 @@ for i in range(len(concordance_table)):
             ])
     elif len(concordance_table[:, 5:]) != len(data['Sample'].unique()) + 1:
         for animal in sorted(snp_table['Name'].unique()):
-            call = snp_table.filter(pl.col('Name') == animal)['Final'].unique()[0]
+            call = snp_table.filter(pl.col('Name') == animal)['Final'].unique()
             concordance_table = concordance_table.with_columns([
               concordance_table[animal].set_at_idx(i,call).alias(animal)
             ])
@@ -165,4 +170,5 @@ final_table = final_table.vstack(non_call_rows)
 final_table = final_table.hstack(new_cols)
 
 # Write output file for viewing in Excel
+import xlsxwriter
 final_table.write_excel('concordance-table.xlsx', autofit=True, has_header=False)
