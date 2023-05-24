@@ -45,6 +45,15 @@ cycle_table <- cycle_table[order(cycle_table$SNP),]
 concordance_table$Cycle <- as.integer(cycle_table[cycle_table$SNP==concordance_table$SNP,"cycle"])
 concordance_table <- concordance_table[concordance_table$Cycle!=0,]
 
+# Create an empty list to store the excel dataframes
+df_list = list()
+
+# Read in the Excel files and store them in the list
+for (file in results_files){
+  i <- as.integer(strsplit(strsplit(file, split = "\\.")[[1]][1], split = "_cycle")[[1]][2])
+  df_list[[i]] <- read_excel(file, skip = 15, sheet = 1)
+}
+
 # loop through each SNP to collate calls
 for (snp in concordance_table$SNP){
   
@@ -56,8 +65,7 @@ for (snp in concordance_table$SNP){
   }
   
   # read in the correct BioMark output file based on that cycle
-  data <- read_excel(paste("28637_BMX003_Detailed_Results_cycle", optimal_cycle, ".xlsx", sep = ""), 
-                     sheet = 1, skip = 15)
+  data <-  df_list[[optimal_cycle]]
   
   # split sample IDs and SNP IDs into their own columns
   data <- separate(data, ID, into = c("sample", "SNP"), sep = "-")
