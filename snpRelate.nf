@@ -129,7 +129,7 @@ process COLLATE_RESULTS {
 	path excel_files
 	
 	output:
-	path "*.xlsx"
+	path "concordance-table.xlsx"
 	
 	script:
 	"""
