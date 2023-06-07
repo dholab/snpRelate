@@ -2,7 +2,7 @@
 _Please note! This workflow is under development and subject to frequent near-term revisions._
 
 ## Overview
-In early 2023, it was revealed that some of the research colony monkeys were illegally harvested from the wild, rather than being the offspring of a documented research animal. The resulting controversy was a major stress-test for the biomedical research community. It also brought organizations who maintain or ship research animals under scrutiny, even when they did things "by the books," with high ethical standards.
+In early 2023, it was revealed that some research colony monkeys were illegally harvested from the wild, rather than being the offspring of a documented research animal. The resulting controversy was a major stress-test for the biomedical research community. It also brought organizations who maintain or ship research animals under scrutiny, even when they did things "by the books," with high ethical standards.
 
 To address this situation and serve the research community, the Genomic Services Unit at the Wisconsin National Primate Research Center began developing a panel of SNPs that could, in conjunction with a BioMark X SNP chip instrument, be used to determine whether two animals that are expected to be related are in fact unrelated. This makes it possible to determine whether any animals, unbeknownst to the colony managers, are in fact of dubious origin.
 
