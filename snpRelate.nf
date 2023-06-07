@@ -139,6 +139,8 @@ process COLLATE_RESULTS {
 }
 
 process PREDICT_RELATEDNESS {
+	
+	publishDir params.results, mode: 'copy'
 
 	input:
 	path concordance_table
@@ -146,12 +148,9 @@ process PREDICT_RELATEDNESS {
 	output:
 	path "*.xlsx"
 
-	when:
-	params.in_dev == false
-
 	script:
 	"""
-	echo "in development"
+	compute-confidences.py ${concordance_table} ${params.vcf}
 	"""
 
 }
