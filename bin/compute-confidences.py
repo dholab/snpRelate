@@ -75,35 +75,38 @@ def hardy_weinberg(allele_freq: float):
 
     return parentage_freq
 
+# multiply Hardy-Weinberg probabilities for every SNP call to create a confidence statistic for each progeny
 def composite_hw(table_df: pl.DataFrame, relations: list):
+  
+  composite_values = []
+  freq_vector = table_df['ALT Allele Frequency'].to_list()
 
-    composite_values = []
-    freq_vector = table_df['ALT Allele Frequency'].to_list()
+  for i in range(len(relations)):
 
-    for i in range(len(relations)):
+    animal = relations[i]
 
-      animal = relations[i]
+    if "Dam" in animal:
+      composite_values+=[None]
+    else:
+        
+      hw_values = []
+      calls = table_df[animal].to_list()
 
-      if "Dam" in animal:
-        composite_values+=[None]
-      else:
-          
-        hw_values = []
-        calls = table_df[animal].to_list()
+      for j in range(len(calls)):
 
-        for call in calls:
+        call = calls[j]
 
-          if call == 'YY' and freq_vector[i] != None:
-            new_hw = hardy_weinberg(freq_vector[i])
-          elif call == 'XX' and freq_vector[i] != None:
-            new_hw = hardy_weinberg(1 - freq_vector[i])
-          else:
-            new_hw = None
-          hw_values+=[new_hw]
+        if call == 'YY' and freq_vector[j] != None:
+          new_hw = hardy_weinberg(freq_vector[j])
+        elif call == 'XX' and freq_vector[j] != None:
+          new_hw = hardy_weinberg(1 - freq_vector[j])
+        else:
+          new_hw = None
+        hw_values+=[new_hw]
 
-        composite_values+=[numpy.prod([float(item) for item in hw_values if item])]
+      composite_values+=[numpy.prod([float(item) for item in hw_values if item])]
 
-    return(composite_values)
+  return composite_values
 
 # define a function that will compute Hardy-Weinberg probabilities for each dam/progeny pair, create a new data frame, 
 # and add confidence columns to the concordance table
